@@ -6,7 +6,7 @@
               <!--                动态设置 menu  注意 index 属性必须是 字符串类型的 -->
               <el-menu router :default-openeds="['0', '1']">
                   <el-submenu v-for="(item, index) in $router.options.routes" :index="index + ''">
-                      <template slot="title"><i class="el-icon-message"></i>{{item.name}}</template>
+                      <template slot="title"><i class="el-icon-menu"></i>{{item.name}}</template>
                       <el-menu-item v-for="(item2, index2) in item.children" :index="item2.path"
                         :class="item2.path==$route.path?'is-active':''">{{item2.name}}</el-menu-item>
                   </el-submenu>
