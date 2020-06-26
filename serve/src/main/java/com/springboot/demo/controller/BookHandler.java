@@ -38,4 +38,40 @@ public class BookHandler {
 
 		return bookRepository.save(book);
 	}
+
+
+
+	@GetMapping("/findById/{id}")
+	public Book findById(@PathVariable("id") Integer id){
+
+		return bookRepository.findById(id).get();
+	}
+
+
+
+	@PutMapping("/update") // 因为要符合 restful 风格，所以这里使用 putMapping
+	public String update(@RequestBody Book book){   // 将json转化为java object
+
+		Book result = bookRepository.save(book);
+		if (result != null){
+			return "success";
+		}else return "failure";
+
+	}
+
+
+
+	@DeleteMapping("/delete/{id}")
+	public String delete(@PathVariable("id") Integer id){
+
+		String result;
+		try {
+			bookRepository.deleteById(id);
+			result = "success";
+		}catch (Exception e){
+			result = "failure";
+		}
+
+		return result;
+	}
 }

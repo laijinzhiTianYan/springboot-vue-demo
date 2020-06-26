@@ -1,5 +1,15 @@
 <template>
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+
+        <el-form-item label="编号">
+            <el-input v-model="ruleForm.id" readonly></el-input>
+        </el-form-item>
+
+        <el-form-item prop="cover" label="封面" >
+            <!-- 封面图片的显示 -->
+                <img :src="ruleForm.cover"  min-width="100" height="100" />
+        </el-form-item>
+
         <el-form-item label="书名" prop="title">
             <el-input v-model="ruleForm.title"></el-input>
         </el-form-item>
@@ -13,63 +23,57 @@
         </el-form-item>
 
         <el-form-item>
-            <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
-            <el-button @click="resetForm('ruleForm')">重置</el-button>
+            <el-button type="primary" @click="submitUpdate('ruleForm')">修改</el-button>
+            <el-button @click="cancelUpdate('ruleForm')">取消</el-button>
         </el-form-item>
     </el-form>
-
 </template>
 
 <script>
     export default {
-        name: "Add",
+        name: "Update",
         data() {
             return {
                 ruleForm: {
+                    id: '',
+                    cover: '',
                     title: '',
                     author: '',
                     abs: ''
                 },
                 rules: {
                     title: [
-                        { required: true, message: '请输入书名', trigger: 'blur' }
+                        {required: true, message: '请输入书名', trigger: 'blur'}
                     ],
                     author: [
-                        { required: true, message: '请输入作者', trigger: 'blur' }
+                        {required: true, message: '请输入作者', trigger: 'blur'}
                     ],
                     abs: [
-                        { required: true, message: '请输入内容简介', trigger: 'blur' }
+                        {required: true, message: '请输入内容简介', trigger: 'blur'}
                     ]
                 }
-            };
+            }
         },
         methods: {
-            submitForm(formName) {
+            submitUpdate(formName) {
                 const _this = this;
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         //
-                        axios.post('http://localhost:8181/book/save', _this.ruleForm).then( (resp) => {
-                            if (resp.data != null){
-                                // _this.$message({
-                                //     message: '恭喜你，添加成功',
-                                //     type: 'success'
-                                // });
-
-                                _this.$alert('《' + _this.ruleForm.title + '》添加成功', '消息', {
+                        axios.put('http://localhost:8181/book/update', _this.ruleForm).then((resp) => {
+                            if (resp.data == 'success') {
+                                _this.$alert('编号为 ' + _this.ruleForm.id + ' 的书修改成功', '消息', {
                                     confirmButtonText: '确定',
                                     callback: action => {
                                         // 添加成功后，我们让页面自动跳转到 查询列表页面
                                         // 同时让 页面跳转到 查询列表界面
                                         // 先获取当前 路由，然后 push 进你的跳转目标页面
-                                        _this.$router.push('/list')
+                                        // _this.$router.push('/list')
                                     }
                                 });
-                                _this.resetForm(formName);
-
-
-                            }else
-                                this.$message.error('添加失败');
+                                _this.cancelUpdate(formName);
+                            } else
+                                this.$message.error('修改失败');
                         })
                     } else {
                         console.log('error submit!!');
@@ -77,9 +81,17 @@
                     }
                 });
             },
-            resetForm(formName) {
-                this.$refs[formName].resetFields();
+            cancelUpdate(formName) {
+                this.$router.push('/list'); // 返回list页面
             }
+        },
+
+        created() {
+            // this.$route.query.id;   // $route 是拿的参数，$router是拿的跳转的路径
+            const _this = this;
+            axios.get('http://localhost:8181/book/findById/' + this.$route.query.id).then(function (resp) {
+                _this.ruleForm = resp.data;
+            })
         }
     }
 </script>

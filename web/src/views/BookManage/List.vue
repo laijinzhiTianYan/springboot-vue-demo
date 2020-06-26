@@ -22,8 +22,8 @@
                 fixed="right"
                 label="操作">
                 <template slot-scope="scope">
-                    <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
-                    <el-button type="text" size="small">编辑</el-button>
+                    <el-button @click="handleEdit(scope.row)" type="text" size="small">修改</el-button>
+                    <el-button @click="deletes(scope.row)" type="text" size="small">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -46,8 +46,36 @@
     export default {
         name: "List",
         methods: {
-            handleClick(row) {
-                console.log(row);
+            deletes(row){
+                const _this = this;
+                axios.delete('http://localhost:8181/book/delete/' + row.id).then(function (resp) {
+                    if (resp.data == 'success'){
+                        _this.$message({
+                            showClose: true,
+                            message: '编号为 ' + row.id + ' 的书删除成功',
+                            type: 'success'
+                        });
+                    } else
+                        _this.$message({
+                            showClose: true,
+                            message: '编号为 ' + row.id + ' 的书删除失败',
+                            type: 'error'
+                        });
+                    // 删除之后，因为当前页面本身就是 /list，所以不能通过 push 路由的方式刷新页面
+                    window.location.reload();
+
+                })
+            },
+
+            handleEdit(row) {
+                // this.$router.push('/update') // 这种方式只支持 跳转的 url
+                // 我们不仅需要 目标跳转url，而且需要 传递参数id
+                this.$router.push({
+                    path: '/update', // 格式固定，必须是 path，query
+                    query: {
+                        id: row.id
+                    }
+                })
             },
 
             page(currentPage){
@@ -61,7 +89,8 @@
 
             handleSelectionChange(val) {
                 this.multipleSelection = val;
-            }
+            },
+
         },
         created(){ // 初始化页面时就调用该函数
             const _this = this;
@@ -74,7 +103,8 @@
         data() {
             return {
                 totalNum: null,
-                tableData: null
+                tableData: null,
+
             }
         }
     }
